@@ -6,6 +6,7 @@ import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import Message from './components/Message'
 import './Message.css'
+import RegisterForm from './components/RegisterForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -23,8 +24,10 @@ const App = () => {
   const isInitialMount = useRef(true);
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
+    blogService.getAll().then(blogs => {
+        blogs.sort((a,b) => (a.likes > b.likes) ? -1 : ((b.likes > a.likes) ? 1 : 0))
+        setBlogs( blogs )
+      }
     )  
   }, [])
 
@@ -72,7 +75,8 @@ const App = () => {
       }
       {
         user === null 
-        ? <LoginForm
+        ? <>
+          <LoginForm
         username={username}
         setUsername={setUsername}
         password={password}
@@ -81,6 +85,8 @@ const App = () => {
         loginService={loginService}
         setMessage={setMessage}
       />
+      <RegisterForm setMessage={setMessage} />
+        </>
         : 
         <div>
           <p>{user.username} <button onClick={logout}>log out</button></p>
@@ -100,9 +106,11 @@ const App = () => {
       }
       
       <h2>blogs</h2>
-      {blogs.map(blog =>
-        <Blog key={Math.random()} blog={blog} setMessage={setMessage} blogs={blogs} setBlogs={setBlogs} />
-      )}
+      <div style={{display: 'flex', gap: '12px', flexWrap: 'wrap'}} id="blogs">
+        {blogs.map(blog =>
+          <Blog key={Math.random()} blog={blog} setMessage={setMessage} blogs={blogs} setBlogs={setBlogs} />
+        )}
+      </div>
     </div>
   )
 }
